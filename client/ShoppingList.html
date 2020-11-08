@@ -35,8 +35,8 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 
   <!-- Navbar on small screens -->
   <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Shopping List</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Recipe Identification</a>
+    <a href="ShoppingList.html" class="w3-bar-item w3-button w3-padding-large">Shopping List</a>
+    <a href="RecipeIdentification.html" class="w3-bar-item w3-button w3-padding-large">Recipe Identification</a>
     <!-- <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 3</a>
     <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 4</a> -->
   </div>
@@ -47,22 +47,6 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   <h1 class="w3-margin w3-jumbo">YOUR FOOD</h1> 
 </header>
 <div id="ingredientList">
-
-  <button class="accordion">Section 1</button>
-  <div class="panel">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  </div>
-
-  <button class="accordion">Section 2</button>
-  <div class="panel">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  </div>
-
-  <button class="accordion">Section 3</button>
-  <div class="panel">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  </div>
-
 </div>
 
 <script>
@@ -113,6 +97,23 @@ function getIngredientsFromServer(callback){
 getIngredientsFromServer(function(ingredients){
   console.log(ingredients)
   console.log(ingredients["ingredients"])
+
+  function getIngredientNutrition(ing){
+    var s = ""
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    for (var key in ing) {
+    // check if the property/key is defined in the object itself, not in parent
+      if (ing.hasOwnProperty(key)) {    
+        if(key != "id" && key != "label"){
+          s += capitalizeFirstLetter(key)+": "+Number((ing[key]).toFixed(1))+"<br>"
+        }       
+      }
+    }
+    return s
+  }
+
   for(var i = 0; i < ingredients["ingredients"].length; i++){
     var ing = ingredients["ingredients"][i]
     var btn = document.createElement("BUTTON");
@@ -124,7 +125,14 @@ getIngredientsFromServer(function(ingredients){
     div.className = "panel"
 
     var p = document.createElement("P");
-    p.innerHTML = JSON.stringify(ing)
+    
+    if(ing["url"] != null){
+      var imageSrc = document.createElement("img")
+      imageSrc.src = ing["url"];
+      p.appendChild(imageSrc)
+    }
+
+    p.innerHTML = getIngredientNutrition(ing)
     div.appendChild(p)
 
     document.getElementById("ingredientList").appendChild(btn)

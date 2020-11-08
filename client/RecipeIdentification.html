@@ -30,8 +30,8 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 
   <!-- Navbar on small screens -->
   <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Shopping List</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Recipe Identification</a>
+    <a href="ShoppingList.html" class="w3-bar-item w3-button w3-padding-large">Shopping List</a>
+    <a href="RecipeIdentification.html" class="w3-bar-item w3-button w3-padding-large">Recipe Identification</a>
     <!-- <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 3</a>
     <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 4</a> -->
   </div>
@@ -39,10 +39,10 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 
 <!-- Header -->
 <header class="w3-container w3-red w3-center" style="padding:128px 16px">
-  <h1 class="w3-margin w3-jumbo">LIFESTYLE</h1>
+  <h1 class="w3-margin w3-jumbo">MAKE FOOD</h1>
 </header>
 
-<div>
+<div class="searchBar">
   <form action="javascript:;" onsubmit="createRecipeList(this)">
     <label for="searchtags">Enter Search Terms (separated by comma):</label>
     <input type="text" id="searchtags" name="searchtags">
@@ -50,13 +50,12 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   </form>
 </div>
 <div id="recipeList">
-  <table style="width: 100%">
+  <table>
     <colgroup>
-       <col span="1" style="width: 15%;">
-       <col span="1" style="width: 70%;">
+       <col span="1" style="width: 25%;">
+       <col span="1" style="width: 75%;">
     </colgroup>
     <tbody id="rtbody">
-
     </tbody>
   </table>
 </div>
@@ -119,6 +118,7 @@ function createRecipeList(){
       
       var imageSrc = document.createElement("img")
       imageSrc.src = recipeImgURL;
+      imageSrc.className = "recipeImage"
       image.appendChild(imageSrc)
 
       var recipeNameEle = document.createElement("p")

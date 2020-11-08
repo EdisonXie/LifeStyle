@@ -1,5 +1,5 @@
 jQuery("#getFile").change(function () {
-    // if($('input[type=file]')[0].files[0] != null){
+    if($('input[type=file]')[0].files[0] != null){
       // document.getElementById("renderImage").innerHTML = '<img src="'+frEvent.target.result+'" />';
       var requestURL = "http://localhost:3000/sendbarcode";
       var fd = new FormData();
@@ -20,6 +20,6 @@ jQuery("#getFile").change(function () {
         },
         dataType: "json"
       });
-    // }
+    }
 });
 

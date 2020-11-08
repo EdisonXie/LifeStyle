@@ -68,6 +68,7 @@ router.post("/sendbarcode", function (req, res, next) {
   };
   
   var finalImage = Buffer.from(fs.readFileSync(fullName).buffer);
+  console.log(finalImage)
   apiInstance.barcodeScanImage(finalImage, callback);
 });
 
