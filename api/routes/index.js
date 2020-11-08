@@ -2,7 +2,7 @@ var express = require("express");
 var request = require("request");
 const fs = require("fs");
 var path = require("path");
-const { randomInt } = require("crypto");
+const { randomInt, Hash } = require("crypto");
 var mime = require('mime-types')
 var router = express.Router();
 resolve = path.resolve;
@@ -17,6 +17,7 @@ var Apikey = defaultClient.authentications['Apikey'];
 Apikey.apiKey = "bee7aebf-526b-4839-b650-f687c86f69bf"
 var apiInstance = new CloudmersiveBarcodeapiClient.BarcodeScanApi();
 
+var spoonacularKey = "1f6dc8ffeb6e477abf27e636e79d6fd3";
 
 router.post("/sendbarcode", function (req, res, next) {
   // send img to barcode api
@@ -66,7 +67,8 @@ router.get("/testinfo", function (req, res, next) {
     console.log(body.url);
     console.log(body.explanation);
 
-    var foodInfo = {"label" : body.hints[0].food.label, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
+    // TODO add imageURL, ingredients, and ID
+    var foodInfo = {"id" : body.hints[0].food.foodId, "label" : body.hints[0].food.label, "url": body.hints[0].image, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
                     "transFat" : body.hints[0].food.nutrients.FATRN, "sugar" : body.hints[0].food.nutrients.SUGAR, "protein" : body.hints[0].food.nutrients.PROCNT,
                     "carbs" : body.hints[0].food.nutrients.CHOCDF, "cholesterol" : body.hints[0].food.nutrients.CHOLE, "calcium" : body.hints[0].food.nutrients.CA}
 
@@ -74,6 +76,59 @@ router.get("/testinfo", function (req, res, next) {
       { "test":foodInfo }
     );
   });
+});
+
+
+router.get("/spoontest/:ingredients", function (req, res, next) {
+
+  var ingredientsList = req.params.ingredients//"apples,flour,sugar"
+  var requestURL = "https://api.spoonacular.com/recipes/findByIngredients?apiKey="+spoonacularKey+"&ingredients="+ingredientsList+"&limitLicens=true&ranking=1&ignorePantry=true";
+
+  request(requestURL, { json: true }, (err, res2, body) => {
+    if (err) { return console.log(err); }
+    console.log(body.url);
+    console.log(body.explanation);
+
+    function cleanRecipeFromRaw(recipe){
+      var ingredients = []
+      function getIngredientsFromList(list){
+        var newList = []
+        console.log(list)
+        for(var i = 0; i < list.length; i++){
+          var ing = list[i]
+
+          newList.push({
+            "id":ing.id,
+            "name":ing.name//,
+            // "image":ing.image
+          })
+        }
+        return newList
+      }
+
+
+      ingredients.push(...getIngredientsFromList(recipe.missedIngredients))
+      ingredients.push(...getIngredientsFromList(recipe.usedIngredients))
+      ingredients.push(...getIngredientsFromList(recipe.unusedIngredients))
+
+      return {
+        "id":recipe.id,
+        "image":recipe.image,
+        "name":recipe.title,
+        "ingredients":ingredients
+      }
+    }
+
+    var recipes = []
+    for(var k = 0; k < body.length; k++){
+      recipes.push(cleanRecipeFromRaw(body[k]))
+    }
+
+    res.json(
+      { "recipes":recipes }
+    );
+  });
 })
+
 
 module.exports = router;
