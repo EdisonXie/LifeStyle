@@ -1,6 +1,7 @@
 .changeColor
 {
     background-image:("https://www.pixelstalk.net/download-hd-swamp-wallpapers/");
+    opacity: 0.8;
 }
 
 .button {
@@ -30,5 +31,22 @@
   }
 
   .BigWord{
-    font-size:1000px
+    font-size: 455%;
+    font-family: "Times New Roman";
+    color: rgb(255, 255, 255);
+    padding-right: -10%;
+  }
+
+  .LessBigWord{
+    font-size: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: rgb(255, 255, 255);
+    margin-top: -5%;
+  }
+
+  .LessBiggerWord{
+    font-size: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: rgb(255, 255, 255);
+    margin-top: 50%;
   }
