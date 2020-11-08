@@ -19,6 +19,10 @@ var apiInstance = new CloudmersiveBarcodeapiClient.BarcodeScanApi();
 
 var spoonacularKey = "1f6dc8ffeb6e477abf27e636e79d6fd3";
 
+
+var userIngredientList = []
+
+
 router.post("/sendbarcode", function (req, res, next) {
   // send img to barcode api
   var imageFile = req.files.image.tempFilePath;
@@ -43,14 +47,15 @@ router.post("/sendbarcode", function (req, res, next) {
         var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+barcodeID+"&app_id="+app_id+"&app_key="+app_key;
 
         request(requestURL, { json: true }, (err, res2, body) => {
-          if (err) { return console.log(err); }
+          if (err || body.error != null) { res.json({"error":"Could not get barcode"}); return; }
           console.log(body.url);
-          console.log(body.explanation);
+          console.log(body);
 
           // parse api data
           var foodInfo = {"id" : body.hints[0].food.foodId, "label" : body.hints[0].food.label, "url": body.hints[0].image, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
                           "transFat" : body.hints[0].food.nutrients.FATRN, "sugar" : body.hints[0].food.nutrients.SUGAR, "protein" : body.hints[0].food.nutrients.PROCNT,
                           "carbs" : body.hints[0].food.nutrients.CHOCDF, "cholesterol" : body.hints[0].food.nutrients.CHOLE, "calcium" : body.hints[0].food.nutrients.CA}
+          userIngredientList.push(foodInfo)
 
           res.json(
             { "foodInfo":foodInfo }
@@ -66,7 +71,7 @@ router.post("/sendbarcode", function (req, res, next) {
   apiInstance.barcodeScanImage(finalImage, callback);
 });
 
-router.get("/spoontest/:ingredients", function (req, res, next) {
+router.get("/recipesearch/:ingredients", function (req, res, next) {
 
   var ingredientsList = req.params.ingredients//"apples,flour,sugar"
   var requestURL = "https://api.spoonacular.com/recipes/findByIngredients?apiKey="+spoonacularKey+"&ingredients="+ingredientsList+"&limitLicens=true&ranking=1&ignorePantry=true";
@@ -116,5 +121,8 @@ router.get("/spoontest/:ingredients", function (req, res, next) {
   });
 })
 
+router.get("/getUserIngredients", function (req, res, next) {
+  res.json({"ingredients": userIngredientList})
+})
 
 module.exports = router;
