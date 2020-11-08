@@ -11,4 +11,3 @@ async function sendApiRequest(){
     let response = await fetch(``);
     console.log(response)
 }
-
