@@ -33,51 +33,38 @@ router.post("/sendbarcode", function (req, res, next) {
     } else {
       console.log('API called successfully. Returned data: ' + data);
 
-      // get back UPC
-      var barcodeType = data["BarcodeType"]
-      var barcodeID = data["RawText"]
+      if(data["Successful"] == true){
+        // get back UPC
+        var barcodeType = data["BarcodeType"]
+        var barcodeID = data["RawText"]
 
-      // send UPC to food API, get back food data
-      // var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+barcodeID+"&app_id="+app_id+"&app_key="+app_key;
+        // send UPC to food API, get back food data
+        // example id - 089125290008
+        var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+barcodeID+"&app_id="+app_id+"&app_key="+app_key;
 
-      // request(requestURL, { json: true }, (err, res, body) => {
-      //   if (err) { return console.log(err); }
-      //   console.log(body.url);
-      //   console.log(body.explanation);
-      // });
-      // parse api data
+        request(requestURL, { json: true }, (err, res2, body) => {
+          if (err) { return console.log(err); }
+          console.log(body.url);
+          console.log(body.explanation);
 
-      //send back food data
-      res.json(
-        { "test":data }
-      );
+          // parse api data
+          var foodInfo = {"id" : body.hints[0].food.foodId, "label" : body.hints[0].food.label, "url": body.hints[0].image, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
+                          "transFat" : body.hints[0].food.nutrients.FATRN, "sugar" : body.hints[0].food.nutrients.SUGAR, "protein" : body.hints[0].food.nutrients.PROCNT,
+                          "carbs" : body.hints[0].food.nutrients.CHOCDF, "cholesterol" : body.hints[0].food.nutrients.CHOLE, "calcium" : body.hints[0].food.nutrients.CA}
+
+          res.json(
+            { "foodInfo":foodInfo }
+          );
+        });
+      }else{
+        res.json({"error":"Could not get barcode"})
+      }
     }
-
   };
   
   var finalImage = Buffer.from(fs.readFileSync(fullName).buffer);
   apiInstance.barcodeScanImage(finalImage, callback);
 });
-
-router.get("/testinfo", function (req, res, next) {
-  var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+"089125290008"+"&app_id="+app_id+"&app_key="+app_key;
-
-  request(requestURL, { json: true }, (err, res2, body) => {
-    if (err) { return console.log(err); }
-    console.log(body.url);
-    console.log(body.explanation);
-
-    // TODO add imageURL, ingredients, and ID
-    var foodInfo = {"id" : body.hints[0].food.foodId, "label" : body.hints[0].food.label, "url": body.hints[0].image, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
-                    "transFat" : body.hints[0].food.nutrients.FATRN, "sugar" : body.hints[0].food.nutrients.SUGAR, "protein" : body.hints[0].food.nutrients.PROCNT,
-                    "carbs" : body.hints[0].food.nutrients.CHOCDF, "cholesterol" : body.hints[0].food.nutrients.CHOLE, "calcium" : body.hints[0].food.nutrients.CA}
-
-    res.json(
-      { "test":foodInfo }
-    );
-  });
-});
-
 
 router.get("/spoontest/:ingredients", function (req, res, next) {
 
@@ -105,7 +92,6 @@ router.get("/spoontest/:ingredients", function (req, res, next) {
         }
         return newList
       }
-
 
       ingredients.push(...getIngredientsFromList(recipe.missedIngredients))
       ingredients.push(...getIngredientsFromList(recipe.usedIngredients))
