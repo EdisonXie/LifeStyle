@@ -5,8 +5,10 @@ var path = require("path");
 const { randomInt } = require("crypto");
 var mime = require('mime-types')
 var router = express.Router();
-
 resolve = path.resolve;
+
+var app_id = "5006334e"
+var app_key = "039d46d8d5d6d44baf7aac8f1ed3cb35"
 
 var CloudmersiveBarcodeapiClient = require('cloudmersive-barcodeapi-client');
 var defaultClient = CloudmersiveBarcodeapiClient.ApiClient.instance;
@@ -35,8 +37,13 @@ router.post("/sendbarcode", function (req, res, next) {
       var barcodeID = data["RawText"]
 
       // send UPC to food API, get back food data
+      // var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+barcodeID+"&app_id="+app_id+"&app_key="+app_key;
 
-
+      // request(requestURL, { json: true }, (err, res, body) => {
+      //   if (err) { return console.log(err); }
+      //   console.log(body.url);
+      //   console.log(body.explanation);
+      // });
       // parse api data
 
       //send back food data
@@ -45,14 +52,28 @@ router.post("/sendbarcode", function (req, res, next) {
       );
     }
 
-
   };
   
   var finalImage = Buffer.from(fs.readFileSync(fullName).buffer);
   apiInstance.barcodeScanImage(finalImage, callback);
 });
 
-// router.post("/checkout", function (req, res, next) {
+router.get("/testinfo", function (req, res, next) {
+  var requestURL = "https://api.edamam.com/api/food-database/v2/parser?upc="+"089125290008"+"&app_id="+app_id+"&app_key="+app_key;
 
+  request(requestURL, { json: true }, (err, res2, body) => {
+    if (err) { return console.log(err); }
+    console.log(body.url);
+    console.log(body.explanation);
+
+    var foodInfo = {"label" : body.hints[0].food.label, "calories" : body.hints[0].food.nutrients.ENERC_KCAL, "saturatedFat" : body.hints[0].food.nutrients.FASAT,
+                    "transFat" : body.hints[0].food.nutrients.FATRN, "sugar" : body.hints[0].food.nutrients.SUGAR, "protein" : body.hints[0].food.nutrients.PROCNT,
+                    "carbs" : body.hints[0].food.nutrients.CHOCDF, "cholesterol" : body.hints[0].food.nutrients.CHOLE, "calcium" : body.hints[0].food.nutrients.CA}
+
+    res.json(
+      { "test":foodInfo }
+    );
+  });
+})
 
 module.exports = router;
